@@ -1,5 +1,6 @@
 {
   "name": "t3rry/rs-queue",
+  "description": "A event/job queue using redis stream",
   "require": {
     "predis/predis": "^1.1"
   },
@@ -15,5 +16,10 @@
   },
   "require-dev": {
     "phpunit/phpunit": "^7"
-  }
+  },
+  "authors": [
+    {
+      "name": "Terry Wang"
+    }
+  ]
 }
