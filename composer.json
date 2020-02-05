@@ -1,5 +1,5 @@
 {
-  "name": "project-laura/module-queue",
+  "name": "t3rry/rs-queue",
   "require": {
     "predis/predis": "^1.1"
   },
