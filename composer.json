@@ -1,0 +1,19 @@
+{
+  "name": "project-laura/module-queue",
+  "require": {
+    "predis/predis": "^1.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Laura\\Module\\Queue\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Laura\\Module\\Queue\\StreamQueue\\": "tests/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7"
+  }
+}
