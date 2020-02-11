@@ -29,7 +29,7 @@ class SQManager
 
     private $eventTable = [];
 
-    private $errorHandler = "echo";
+    private $errorHandler = null;
 
 
     public function loadQueueConfig($redisConfig)
@@ -82,14 +82,14 @@ class SQManager
                 try {
                     $listener->handle($object);
                 } catch (Exception $e) {
-                    ($this->errorHandler)($e->getMessage());
+                    $this->handleError($e->getMessage());
                 }
             }
         } else if ($object instanceof SQIJob) {
             try {
                 $object->handle();
             } catch (Exception $e) {
-                ($this->errorHandler)($e->getMessage());
+                $this->handleError($e->getMessage());
             }
 
         }
