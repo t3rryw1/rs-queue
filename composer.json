@@ -1,6 +1,7 @@
 {
   "name": "t3rry/rs-queue",
   "description": "A event/job queue using redis stream",
+  "license": "MIT",
   "require": {
     "predis/predis": "^1.1"
   },
@@ -19,7 +20,8 @@
   },
   "authors": [
     {
-      "name": "Terry Wang"
+      "name": "Terry Wang",
+      "email": "zhichangterry@gmail.com"
     }
   ]
 }
