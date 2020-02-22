@@ -3,7 +3,8 @@
   "description": "A event/job queue using redis stream",
   "license": "MIT",
   "require": {
-    "predis/predis": "^1.1"
+    "predis/predis": "^1.1",
+    "t3rry/lbase": "1.0"
   },
   "autoload": {
     "psr-4": {

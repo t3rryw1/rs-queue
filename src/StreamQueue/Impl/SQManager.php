@@ -5,6 +5,7 @@ namespace Laura\Module\Queue\StreamQueue\Impl;
 
 
 use Exception;
+use Laura\Lib\Base\Log;
 use Laura\Module\Queue\StreamQueue\SQException;
 use Laura\Module\Queue\StreamQueue\SQIEvent;
 use Laura\Module\Queue\StreamQueue\SQIJob;
@@ -196,6 +197,8 @@ class SQManager
     {
         if ($this->errorHandler) {
             ($this->errorHandler)($errorMessage);
+        } else {
+            Log::error($errorMessage);
         }
     }
 
