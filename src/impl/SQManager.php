@@ -37,8 +37,14 @@ class SQManager
     public static function load($config=[], $useLogger=false){
         if (!self::$instance) {
             if($useLogger && isset($config['log_path'])){
-                $logger = new Logger(isset($config['log_name']) ? $config['log_name'] : 'queue');
-                $logger->pushHandler(new RotatingFileHandler($config['log_path']));
+                $logger = new Logger(
+                    isset($config['log_name'])
+                    ? $config['log_name']
+                    : 'queue');
+                $logger->pushHandler(new RotatingFileHandler(
+                    $config['log_path'],
+                    0,
+                    $config['log_level']??Logger::Debug));
                 self::$instance = new SQManager(new DefaultQueue($config), $logger);
             }else{
                 self::$instance = new SQManager(new DefaultQueue($config), null);
