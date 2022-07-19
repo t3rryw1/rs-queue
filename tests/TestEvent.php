@@ -1,8 +1,8 @@
 <?php
+
 namespace Laura\Module\Queue\StreamQueue;
 
-
-use Laura\Module\Queue\StreamQueue\Impl\BaseEvent;
+use Laura\Lib\Queue\BaseEvent;
 
 class TestEvent extends BaseEvent
 {
@@ -13,8 +13,8 @@ class TestEvent extends BaseEvent
         $this->value = $value;
     }
 
-    public function getValue(){
+    public function getValue()
+    {
         return $this->value;
     }
-
 }

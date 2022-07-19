@@ -2,12 +2,10 @@
 
 namespace Laura\Module\Queue\StreamQueue;
 
-
-use Laura\Module\Queue\StreamQueue\Impl\BaseListener;
+use Laura\Lib\Queue\BaseListener;
 
 class TestStaticListener extends BaseListener
 {
-
     private static $value = 0;
 
 

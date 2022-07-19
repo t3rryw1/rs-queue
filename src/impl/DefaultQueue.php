@@ -1,12 +1,8 @@
 <?php
 
+namespace Laura\Lib\Queue;
 
-namespace Laura\Module\Queue\StreamQueue\Impl;
-
-use Laura\Module\Queue\StreamQueue\SQException;
-use Laura\Module\Queue\StreamQueue\SQIQueue;
 use Predis\Client;
-
 
 class DefaultQueue implements SQIQueue
 {
@@ -25,9 +21,7 @@ class DefaultQueue implements SQIQueue
             'port' => 6379
         ], array_filter($redisConfig));
         $this->redis = new Client($redisConfig);
-
         $this->consumerId = rand(10000, 99999);
-
     }
 
     /**
@@ -39,7 +33,7 @@ class DefaultQueue implements SQIQueue
     public function push($name, $object)
     {
         $error = false;
-        $id = $this->redis->executeRaw(["xadd", $name, '*', "data", serialize($object)], $error);
+        $id = $this->redis->executeRaw(["xadd", $name, "MAXLEN","~","1000",'*', "data", serialize($object)], $error);
         if (!$error) {
             return $id;
         }
@@ -54,11 +48,12 @@ class DefaultQueue implements SQIQueue
      * @return object | object[]
      * @throws SQException
      */
-    public function read($key,
-                         $count = 1,
-                         &$lastId = null,
-                         $startingId = 0)
-    {
+    public function read(
+        $key,
+        $count = 1,
+        &$lastId = null,
+        $startingId = 0
+    ) {
         $error = false;
         $res = $this->redis->executeRaw(["xread",
             'COUNT',
@@ -81,7 +76,6 @@ class DefaultQueue implements SQIQueue
             }
         }
         throw new SQException($error);
-
     }
 
     /**
@@ -94,13 +88,14 @@ class DefaultQueue implements SQIQueue
      * @return object | object[]
      * @throws SQException
      */
-    public function groupRead($name,
-                              $groupName,
-                              &$lastId,
-                              $count = 1,
-                              $newMessage = true,
-                              $startingId = 0)
-    {
+    public function groupRead(
+        $name,
+        $groupName,
+        &$lastId,
+        $count = 1,
+        $newMessage = true,
+        $startingId = 0
+    ) {
         $error = false;
         $startingSymbol = $newMessage ? '>' : "$startingId";
         $this->redis->executeRaw(["xgroup",
@@ -134,11 +129,9 @@ class DefaultQueue implements SQIQueue
                 }
                 return null;
             }
-
         }
         echo "error";
         throw new SQException($error);
-
     }
 
     /**
@@ -172,12 +165,18 @@ class DefaultQueue implements SQIQueue
 
     private function getObject($value, &$resultList, &$idList)
     {
-        if (!$value) return null;
+        if (!$value) {
+            return null;
+        }
         $res = reset($value);
-        if (!$res) return null;
+        if (!$res) {
+            return null;
+        }
         $firstKey = current($res);
         $firstValueSet = next($res);
-        if (!$firstValueSet) return null;
+        if (!$firstValueSet) {
+            return null;
+        }
         foreach ($firstValueSet as $valueTable) {
             $idList[] = current($valueTable);
             $value = next($valueTable);
@@ -187,6 +186,4 @@ class DefaultQueue implements SQIQueue
             }
         }
     }
-
-
 }

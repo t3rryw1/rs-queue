@@ -2,13 +2,10 @@
 
 namespace Laura\Module\Queue\StreamQueue;
 
-
-use Laura\Module\Queue\StreamQueue\Impl\BaseJob;
+use Laura\Lib\Queue\BaseJob;
 
 class TestStaticJob extends BaseJob
 {
-
-
     private static $staticValue = 0;
     private $value;
 

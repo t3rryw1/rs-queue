@@ -4,20 +4,20 @@
   "license": "MIT",
   "require": {
     "predis/predis": "^1.1",
-    "t3rry/lbase": "1.0"
+    "monolog/monolog": "^3.1"
   },
   "autoload": {
     "psr-4": {
-      "Laura\\Module\\Queue\\": "src/"
+      "Laura\\Lib\\Queue\\": ["src/","src/impl"]
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Laura\\Module\\Queue\\StreamQueue\\": "tests/"
+      "Laura\\Lib\\Queue\\": "tests/"
     }
   },
   "require-dev": {
-    "phpunit/phpunit": "^7"
+    "phpunit/phpunit": "^9.5"
   },
   "authors": [
     {

@@ -1,10 +1,6 @@
 <?php
 
-namespace Laura\Module\Queue\StreamQueue\Impl;
-
-
-use Laura\Module\Queue\StreamQueue\SQException;
-use Laura\Module\Queue\StreamQueue\SQIEvent;
+namespace Laura\Lib\Queue;
 
 abstract class BaseEvent implements SQIEvent
 {
@@ -12,7 +8,7 @@ abstract class BaseEvent implements SQIEvent
      * @param array $parameters
      * @throws SQException
      */
-    public final function dispatch($parameters = [])
+    final public function dispatch($parameters = [])
     {
         SQManager::getInstance()->dispatch($this, $parameters);
     }
@@ -22,7 +18,7 @@ abstract class BaseEvent implements SQIEvent
         return false;
     }
 
-    public  static function streamName()
+    public static function streamName()
     {
         return str_replace('\\', '_', static::class);
     }

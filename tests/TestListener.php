@@ -2,12 +2,10 @@
 
 namespace Laura\Module\Queue\StreamQueue;
 
-
-use Laura\Module\Queue\StreamQueue\Impl\BaseListener;
+use Laura\Lib\Queue\BaseListener;
 
 class TestListener extends BaseListener
 {
-
     private $value;
 
 
@@ -24,6 +22,5 @@ class TestListener extends BaseListener
     {
         $this->value = $event->getValue();
         return false;
-
     }
 }

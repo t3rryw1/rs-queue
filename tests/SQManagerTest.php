@@ -2,8 +2,7 @@
 
 namespace Laura\Module\Queue\StreamQueue;
 
-
-use Laura\Module\Queue\StreamQueue\Impl\SQManager;
+use Laura\Lib\Queue\SQManager;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -18,12 +17,12 @@ use PHPUnit\Framework\TestCase;
  */
 class SQManagerTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         SQManager::getInstance()->loadQueueConfig([]);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         SQManager::getInstance()->register(TestEvent::class, new TestListener());
     }
@@ -76,7 +75,6 @@ class SQManagerTest extends TestCase
             $this->assertEquals($listener->getPlusOne(), 348);
         }
 
-
         //3 events in, 3 listener load
         (new TestEvent(345))->dispatch(['shouldQueue' => true]);
         (new TestEvent(346))->dispatch(['shouldQueue' => true]);
@@ -119,10 +117,10 @@ class SQManagerTest extends TestCase
 
         //read job from queue and execute
         $itemId = null;
+        /** @var TestJob */
         $item = SQManager::getInstance()->loadItem(SQManager::SQ_MANAGER_JOB_STREAM, SQManager::SQ_MANAGER_JOB_HANDLER, $itemId);
         $item->handle();
         $this->assertEquals($item->getPlusOne(), 125);
-
     }
 
     /**
@@ -137,6 +135,7 @@ class SQManagerTest extends TestCase
 
         //read job from queue and execute
         $itemId = null;
+        /** @var TestJob */
         $item = SQManager::getInstance()->loadItem(SQManager::SQ_MANAGER_JOB_STREAM, SQManager::SQ_MANAGER_JOB_HANDLER, $itemId);
         $item->handle();
         $this->assertEquals($item->getPlusOne(), 125);
@@ -146,11 +145,13 @@ class SQManagerTest extends TestCase
         $this->assertNull($item);
 
         //load  pending items return job
+        /** @var TestJob */
         $item = SQManager::getInstance()->loadItem(SQManager::SQ_MANAGER_JOB_STREAM, SQManager::SQ_MANAGER_JOB_HANDLER, $itemId, 1, false);
         $item->handle();
         $this->assertEquals($item->getPlusOne(), 125);
 
         //on more time should give same job
+        /** @var TestJob */
         $item = SQManager::getInstance()->loadItem(SQManager::SQ_MANAGER_JOB_STREAM, SQManager::SQ_MANAGER_JOB_HANDLER, $itemId, 1, false);
         $item->handle();
         $this->assertEquals($item->getPlusOne(), 125);
@@ -164,15 +165,14 @@ class SQManagerTest extends TestCase
         $this->assertNull($item);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         SQManager::getInstance()->getQueue()->getRedis()->del([
             SQManager::SQ_MANAGER_PREFIX . TestEvent::streamName(),
             SQManager::SQ_MANAGER_PREFIX . SQManager::SQ_MANAGER_JOB_STREAM]);
-
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         SQManager::getInstance()->destroy();
     }

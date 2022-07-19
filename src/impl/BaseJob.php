@@ -1,10 +1,6 @@
 <?php
 
-namespace Laura\Module\Queue\StreamQueue\Impl;
-
-
-use Laura\Module\Queue\StreamQueue\SQException;
-use Laura\Module\Queue\StreamQueue\SQIJob;
+namespace Laura\Lib\Queue;
 
 abstract class BaseJob implements SQIJob
 {
@@ -12,7 +8,7 @@ abstract class BaseJob implements SQIJob
      * @param array $parameters
      * @throws SQException
      */
-    public final function dispatch($parameters = [])
+    final public function dispatch($parameters = [])
     {
         SQManager::getInstance()->dispatch($this, $parameters);
     }
@@ -21,5 +17,4 @@ abstract class BaseJob implements SQIJob
     {
         return false;
     }
-
 }
