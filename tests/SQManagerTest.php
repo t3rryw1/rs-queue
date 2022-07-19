@@ -19,7 +19,7 @@ class SQManagerTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
-        SQManager::getInstance()->loadQueueConfig([]);
+        SQManager::load();
     }
 
     public function setUp(): void
