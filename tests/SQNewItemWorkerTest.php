@@ -25,7 +25,7 @@ class SQNewItemWorkerTest extends TestCase
 
     public function setUp(): void
     {
-        $this->worker = new SQWorker(true, 0, "__error");
+        $this->worker = new SQWorker(true, 0);
         SQManager::getInstance()->register(TestEvent::class, new TestListener());
         SQManager::getInstance()->register(TestEvent::class, new TestStaticListener());
         SQManager::getInstance()->loadQueueConfig([]);
