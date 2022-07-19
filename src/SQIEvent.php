@@ -1,7 +1,6 @@
 <?php
 
-namespace Laura\Module\Queue\StreamQueue;
-
+namespace Laura\Lib\Queue;
 
 interface SQIEvent
 {

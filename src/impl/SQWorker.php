@@ -1,15 +1,9 @@
 <?php
 
-namespace Laura\Module\Queue\StreamQueue\Impl;
-
-
-use Laura\Module\Queue\StreamQueue\SQException;
-use Laura\Module\Queue\StreamQueue\SQIEvent;
-use Laura\Module\Queue\StreamQueue\SQIJob;
+namespace Laura\Lib\Queue;
 
 class SQWorker
 {
-
     /**
      * @var SQManager
      */
@@ -21,7 +15,7 @@ class SQWorker
     public function __construct($newItem = true, $startId = 0, $errorHandle = null)
     {
         $this->manager = SQManager::getInstance();
-        if($errorHandle){
+        if ($errorHandle) {
             $this->manager->setErrorHandler($errorHandle);
         }
         $this->newItem = $newItem;
@@ -36,19 +30,21 @@ class SQWorker
      */
     public function singleRun($newItem = true, $startId = 0)
     {
-        printf("\nRunning worker\n");
+        printf("-");
 
 
         foreach ($this->manager->getEvents() as $eventName) {
             $listeners = $this->manager->getListeners($eventName);
             foreach ($listeners as $listener) {
                 $itemId = null;
-                $item = $this->manager->loadItem($eventName,
+                $item = $this->manager->loadItem(
+                    $eventName,
                     $listener->streamGroupName(),
                     $itemId,
                     1,
                     $newItem,
-                    $startId);
+                    $startId
+                );
 
                 if ($item instanceof SQIEvent) {
                     if ($newItem) {
@@ -58,14 +54,16 @@ class SQWorker
                     }
                     try {
                         $res = $listener->handle($item);
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         $this->manager->handleError($e->getMessage());
                         $res = false;
                     }
                     if ($res) {
-                        $this->manager->ackItem($eventName,
+                        $this->manager->ackItem(
+                            $eventName,
                             $listener->streamGroupName(),
-                            $itemId);
+                            $itemId
+                        );
                         printf("Event %s acked on %s\n", get_class($item), get_class($listener));
                     } else {
                         printf("Event %s not handled correctly by %s\n", get_class($item), get_class($listener));
@@ -74,17 +72,18 @@ class SQWorker
             }
         }
         $itemId = null;
-        $item = $this->manager->loadItem(SQManager::SQ_MANAGER_JOB_STREAM,
+        $item = $this->manager->loadItem(
+            SQManager::SQ_MANAGER_JOB_STREAM,
             SQManager::SQ_MANAGER_JOB_HANDLER,
             $itemId,
             1,
             $newItem,
-            $startId);
+            $startId
+        );
 
         if ($item instanceof SQIJob) {
             if ($newItem) {
                 printf("New Job  %s received\n", get_class($item));
-
             } else {
                 printf("Pending Job  %s received\n", get_class($item));
             }
@@ -96,16 +95,17 @@ class SQWorker
             }
 
             if ($res) {
-                $this->manager->ackItem(SQManager::SQ_MANAGER_JOB_STREAM,
+                $this->manager->ackItem(
+                    SQManager::SQ_MANAGER_JOB_STREAM,
                     SQManager::SQ_MANAGER_JOB_HANDLER,
-                    $itemId);
+                    $itemId
+                );
                 printf("Job  %s acked\n", get_class($item));
             } else {
                 printf("Job  %s  not handled correctly\n", get_class($item));
             }
         }
-        printf("Done worker\n");
-
+        printf(">");
     }
 
     public function run()
@@ -118,6 +118,5 @@ class SQWorker
             }
             sleep(1);
         }
-
     }
 }

@@ -1,7 +1,6 @@
 <?php
 
-namespace Laura\Module\Queue\StreamQueue;
-
+namespace Laura\Lib\Queue;
 
 interface SQIJob
 {
@@ -13,5 +12,4 @@ interface SQIJob
     public function handle();
 
     public function shouldQueue();
-
 }

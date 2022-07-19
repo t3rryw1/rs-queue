@@ -2,13 +2,10 @@
 
 namespace Laura\Module\Queue\StreamQueue;
 
-
-use Laura\Module\Queue\StreamQueue\Impl\BaseJob;
+use Laura\Lib\Queue\BaseJob;
 
 class TestJob extends BaseJob
 {
-
-
     private $value;
 
     public function __construct($value)

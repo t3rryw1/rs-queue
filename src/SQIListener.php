@@ -1,7 +1,6 @@
 <?php
 
-namespace Laura\Module\Queue\StreamQueue;
-
+namespace Laura\Lib\Queue;
 
 interface SQIListener
 {
@@ -21,5 +20,4 @@ interface SQIListener
      * @return boolean
      */
     public function processOldItem();
-
 }

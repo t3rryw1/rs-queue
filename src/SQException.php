@@ -1,8 +1,6 @@
 <?php
 
-
-namespace Laura\Module\Queue\StreamQueue;
-
+namespace Laura\Lib\Queue;
 
 use Exception;
 use Throwable;
@@ -13,5 +11,4 @@ class SQException extends Exception
     {
         parent::__construct($message, $code, $previous);
     }
-
 }

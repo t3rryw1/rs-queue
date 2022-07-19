@@ -2,9 +2,8 @@
 
 namespace Laura\Module\Queue\StreamQueue;
 
-
-use Laura\Module\Queue\StreamQueue\Impl\SQManager;
-use Laura\Module\Queue\StreamQueue\Impl\SQWorker;
+use Laura\Lib\Queue\SQManager;
+use Laura\Lib\Queue\SQWorker;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,19 +18,17 @@ use PHPUnit\Framework\TestCase;
  */
 class SQNewItemWorkerTest extends TestCase
 {
-
     /**
      * @var SQWorker
      */
     private $worker;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->worker = new SQWorker(true, 0, "__error");
         SQManager::getInstance()->register(TestEvent::class, new TestListener());
         SQManager::getInstance()->register(TestEvent::class, new TestStaticListener());
         SQManager::getInstance()->loadQueueConfig([]);
-
     }
 
     /**
@@ -50,7 +47,6 @@ class SQNewItemWorkerTest extends TestCase
         //no task remains
         $this->worker->singleRun(false, 0);
         $this->assertEquals(TestStaticListener::getValue(), 345 + 346 + 347);
-
     }
 
     /**
@@ -61,19 +57,17 @@ class SQNewItemWorkerTest extends TestCase
         (new TestStaticJob(345))->dispatch(['shouldQueue' => true]);
         $this->worker->singleRun();
         $this->assertEquals(TestStaticJob::getStaticValue(), 345);
-
     }
 
 
-    public function tearDown()
+    public function tearDown(): void
     {
         SQManager::getInstance()->getQueue()->getRedis()->del([
             SQManager::SQ_MANAGER_PREFIX . TestEvent::streamName(),
             SQManager::SQ_MANAGER_PREFIX . SQManager::SQ_MANAGER_JOB_STREAM]);
-
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         SQManager::getInstance()->destroy();
     }
