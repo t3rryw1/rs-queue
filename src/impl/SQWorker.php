@@ -12,12 +12,9 @@ class SQWorker
     private $newItem;
 
 
-    public function __construct($newItem = true, $startId = 0, $errorHandle = null)
+    public function __construct($newItem = true, $startId = 0)
     {
         $this->manager = SQManager::getInstance();
-        if ($errorHandle) {
-            $this->manager->setErrorHandler($errorHandle);
-        }
         $this->newItem = $newItem;
         $this->startId = $startId;
     }
@@ -55,7 +52,7 @@ class SQWorker
                     try {
                         $res = $listener->handle($item);
                     } catch (\Throwable $e) {
-                        $this->manager->handleError($e->getMessage());
+                        $this->manager->getLogger()->error("Error process async event - ",['message'=>$e->getMessage()]);
                         $res = false;
                     }
                     if ($res) {
@@ -90,7 +87,7 @@ class SQWorker
             try {
                 $res = $item->handle();
             } catch (\Exception $e) {
-                $this->manager->handleError($e->getMessage());
+                $this->manager->getLogger()->error("Error process async job - ",['message'=>$e->getMessage()]);
                 $res = false;
             }
 
@@ -114,7 +111,7 @@ class SQWorker
             try {
                 $this->singleRun($this->newItem, $this->startId);
             } catch (SQException $e) {
-                $this->manager->handleError($e->getMessage());
+                $this->manager->getLogger()->error("Error process async event - ",['message'=>$e->getMessage()]);
             }
             sleep(1);
         }

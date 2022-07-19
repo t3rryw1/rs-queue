@@ -31,6 +31,9 @@ class SQManager
 
     public function __construct($logger)
     {
+        if(!$logger){
+            $this->logger = new Logger('queue');
+        }
         $this->logger = $logger;
     }
 
@@ -39,14 +42,14 @@ class SQManager
         $this->queue = new DefaultQueue($redisConfig);
     }
 
-    public static function load( $useLogger=true, $logPath ){
+    public static function load( $useLogger=true, $config=[]){
         if (!self::$instance) {
             if($useLogger){
                 $logger = new Logger(isset($config['name'])?$config['name']:'queue');
                 $logger->pushHandler(new RotatingFileHandler($config['path']));
                 self::$instance = new SQManager($logger);
             }else{
-                self::$instance = new SQManager();
+                self::$instance = new SQManager(null);
 
             }
         }
@@ -95,15 +98,11 @@ class SQManager
                 try {
                     $listener->handle($object);
                 } catch (Exception $e) {
-                    $this->handleError($e->getMessage());
+                    $this->logger->error("Error running sync event - ",['message'=>$e->getMessage()]);
                 }
             }
         } elseif ($object instanceof SQIJob) {
-            try {
-                $object->handle();
-            } catch (Exception $e) {
-                $this->handleError($e->getMessage());
-            }
+            $object->handle();
         }
     }
 
@@ -204,15 +203,8 @@ class SQManager
         $this->eventTable = [];
     }
 
-    public function setErrorHandler($errorHandler)
-    {
-        $this->errorHandler = $errorHandler;
+    public function getLogger(){
+        return $this->logger;
     }
 
-    public function handleError(string $errorMessage)
-    {
-        if ($this->errorHandler) {
-            call_user_func($this->errorHandler,$errorMessage);
-        } 
-    }
 }
