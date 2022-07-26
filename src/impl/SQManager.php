@@ -29,26 +29,25 @@ class SQManager
     /** @var Logger */
     private $logger;
 
-    public function __construct($logger)
+    private function __construct($queue, $logger)
     {
-        $this->logger = $logger ?? new Logger('queue'); 
+        $this->queue = $queue;
+        $this->logger = $logger ; 
     }
 
-    public static function load($config=[], $useLogger=false){
+    public static function load($config=[]){
         if (!self::$instance) {
-            if($useLogger && isset($config['log_path'])){
-                $logger = new Logger(
-                    isset($config['log_name'])
-                    ? $config['log_name']
-                    : 'queue');
+            $logger = new Logger(
+                isset($config['log_name'])
+                ? $config['log_name']
+                : 'queue');
+            if(isset($config['log_path'])){
                 $logger->pushHandler(new RotatingFileHandler(
                     $config['log_path'],
                     0,
                     $config['log_level']??Logger::Debug));
-                self::$instance = new SQManager(new DefaultQueue($config), $logger);
-            }else{
-                self::$instance = new SQManager(new DefaultQueue($config), null);
             }
+            self::$instance = new SQManager(new DefaultQueue($config), $logger);
         }
     }
 
