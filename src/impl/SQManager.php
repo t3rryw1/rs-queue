@@ -45,7 +45,7 @@ class SQManager
                 $logger->pushHandler(new RotatingFileHandler(
                     $config['log_path'],
                     0,
-                    $config['log_level']??Logger::Debug));
+                    $config['log_level']??Logger::DEBUG));
             }
             self::$instance = new SQManager(new DefaultQueue($config), $logger);
         }
@@ -170,7 +170,9 @@ class SQManager
             $newMessage,
             $startId
         );
-        $this->logger->info("Load with from queue - ",$item);
+        if($item){
+            $this->logger->info("Load from queue - ", (array)$item);
+        }
         return $item;
 
     }

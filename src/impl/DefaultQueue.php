@@ -130,7 +130,6 @@ class DefaultQueue implements SQIQueue
                 return null;
             }
         }
-        echo "error";
         throw new SQException($error);
     }
 
