@@ -27,8 +27,7 @@ class SQWorker
      */
     public function singleRun($newItem = true, $startId = 0)
     {
-        printf("-");
-
+        system("clear");
 
         foreach ($this->manager->getEvents() as $eventName) {
             $listeners = $this->manager->getListeners($eventName);
@@ -52,7 +51,9 @@ class SQWorker
                     try {
                         $res = $listener->handle($item);
                     } catch (\Throwable $e) {
-                        $this->manager->getLogger()->error("Error process async event - ",['message'=>$e->getMessage()]);
+                        $this->manager->getLogger()->error(
+                            "Error process async event - ",
+                            ['message'=>$e->getMessage()]);
                         $res = false;
                     }
                     if ($res) {
@@ -61,9 +62,19 @@ class SQWorker
                             $listener->streamGroupName(),
                             $itemId
                         );
-                        printf("Event %s acked on %s\n", get_class($item), get_class($listener));
+                        
+                        $this->manager->getLogger()->info(
+                            sprintf(
+                                "Event %s acked on %s\n",
+                                get_class($item),
+                                get_class($listener)));
                     } else {
-                        printf("Event %s not handled correctly by %s\n", get_class($item), get_class($listener));
+                        printf("Error!");
+                        $this->manager->getLogger()->error(
+                            sprintf(
+                                "Event %s not handled correctly by %s\n",
+                                get_class($item),
+                                get_class($listener)));
                     }
                 }
             }
@@ -87,7 +98,9 @@ class SQWorker
             try {
                 $res = $item->handle();
             } catch (\Exception $e) {
-                $this->manager->getLogger()->error("Error process async job - ",['message'=>$e->getMessage()]);
+                $this->manager->getLogger()->error(
+                    "Error process async job - ",
+                    ['message'=>$e->getMessage()]);
                 $res = false;
             }
 
@@ -97,12 +110,19 @@ class SQWorker
                     SQManager::SQ_MANAGER_JOB_HANDLER,
                     $itemId
                 );
-                printf("Job  %s acked\n", get_class($item));
+                $this->manager->getLogger()->info(
+                    sprintf(
+                        "Job  %s acked\n", 
+                        get_class($item)));
             } else {
-                printf("Job  %s  not handled correctly\n", get_class($item));
+                printf("Error!");
+                $this->manager->getLogger()->error(
+                    sprintf(
+                        "Job  %s  not handled correctly\n", 
+                        get_class($item)));
             }
         }
-        printf(">");
+        printf(".");
     }
 
     public function run()
@@ -110,8 +130,10 @@ class SQWorker
         while (true) {
             try {
                 $this->singleRun($this->newItem, $this->startId);
-            } catch (SQException $e) {
-                $this->manager->getLogger()->error("Error process async event - ",['message'=>$e->getMessage()]);
+            } catch (\Throwable $e) {
+                $this->manager->getLogger()->error(
+                    "Error process async event - ",
+                    ['message'=>$e->getMessage()]);
             }
             sleep(1);
         }
