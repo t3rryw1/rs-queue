@@ -75,7 +75,7 @@ class SQManager
         if ($listener instanceof SQIListener) {
             $this->eventTable[$eventClass][] = $listener;
         } elseif (is_string($listener)) {
-            $this->eventTable[$eventClass][] = new $listener();
+            $this->eventTable[$eventClass][] = $listener;
         }
     }
 
@@ -107,7 +107,12 @@ class SQManager
      */
     public function getEvents()
     {
-        return array_keys($this->eventTable);
+        return array_map(
+            fn($listener)=>
+            is_string($listener)
+                ? new $listener()
+                :   $listener,
+            array_keys($this->eventTable));
     }
 
     /**
