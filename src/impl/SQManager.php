@@ -108,10 +108,13 @@ class SQManager
     public function getEvents()
     {
         return array_map(
-            fn($listener)=>
-            is_string($listener)
-                ? new $listener()
-                :   $listener,
+            fn($listeners) =>
+                array_map(
+                    fn($listener) =>
+                        is_object($listener)
+                            ? $listener
+                            : new $listener(),
+                    $listeners),
             array_keys($this->eventTable));
     }
 
