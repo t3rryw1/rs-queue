@@ -14,11 +14,12 @@ class TestJob extends BaseJob
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function handle()
     {
         $this->value += 1;
+
         return false;
     }
 

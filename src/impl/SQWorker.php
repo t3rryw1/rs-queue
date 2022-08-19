@@ -8,9 +8,10 @@ class SQWorker
      * @var SQManager
      */
     private $manager;
-    private $startId;
-    private $newItem;
 
+    private $startId;
+
+    private $newItem;
 
     public function __construct($newItem = true, $startId = 0)
     {
@@ -19,7 +20,6 @@ class SQWorker
         $this->startId = $startId;
     }
 
-
     /**
      * @param bool $newItem
      * @param int $startId
@@ -27,7 +27,7 @@ class SQWorker
      */
     public function singleRun($newItem = true, $startId = 0)
     {
-        system("clear");
+        system('clear');
 
         foreach ($this->manager->getEvents() as $eventName) {
             $listeners = $this->manager->getListeners($eventName);
@@ -52,8 +52,9 @@ class SQWorker
                         $res = $listener->handle($item);
                     } catch (\Throwable $e) {
                         $this->manager->getLogger()->error(
-                            "Error process async event - ",
-                            ['message'=>$e->getMessage()]);
+                            'Error process async event - ',
+                            ['message'=>$e->getMessage()]
+                        );
                         $res = false;
                     }
                     if ($res) {
@@ -62,19 +63,23 @@ class SQWorker
                             $listener->streamGroupName(),
                             $itemId
                         );
-                        
+
                         $this->manager->getLogger()->info(
                             sprintf(
                                 "Event %s acked on %s\n",
                                 get_class($item),
-                                get_class($listener)));
+                                get_class($listener)
+                            )
+                        );
                     } else {
-                        printf("Error!");
+                        printf('Error!');
                         $this->manager->getLogger()->error(
                             sprintf(
                                 "Event %s not handled correctly by %s\n",
                                 get_class($item),
-                                get_class($listener)));
+                                get_class($listener)
+                            )
+                        );
                     }
                 }
             }
@@ -99,8 +104,9 @@ class SQWorker
                 $res = $item->handle();
             } catch (\Exception $e) {
                 $this->manager->getLogger()->error(
-                    "Error process async job - ",
-                    ['message'=>$e->getMessage()]);
+                    'Error process async job - ',
+                    ['message'=>$e->getMessage()]
+                );
                 $res = false;
             }
 
@@ -112,17 +118,21 @@ class SQWorker
                 );
                 $this->manager->getLogger()->info(
                     sprintf(
-                        "Job  %s acked\n", 
-                        get_class($item)));
+                        "Job  %s acked\n",
+                        get_class($item)
+                    )
+                );
             } else {
-                printf("Error!");
+                printf('Error!');
                 $this->manager->getLogger()->error(
                     sprintf(
-                        "Job  %s  not handled correctly\n", 
-                        get_class($item)));
+                        "Job  %s  not handled correctly\n",
+                        get_class($item)
+                    )
+                );
             }
         }
-        printf(".");
+        printf('.');
     }
 
     public function run()
@@ -132,8 +142,9 @@ class SQWorker
                 $this->singleRun($this->newItem, $this->startId);
             } catch (\Throwable $e) {
                 $this->manager->getLogger()->error(
-                    "Error process async event - ",
-                    ['message'=>$e->getMessage()]);
+                    'Error process async event - ',
+                    ['message'=>$e->getMessage()]
+                );
             }
             sleep(1);
         }

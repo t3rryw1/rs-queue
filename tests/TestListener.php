@@ -8,7 +8,6 @@ class TestListener extends BaseListener
 {
     private $value;
 
-
     public function getPlusOne()
     {
         return $this->value + 1;
@@ -16,11 +15,12 @@ class TestListener extends BaseListener
 
     /**
      * @param TestEvent $event
-     * @return boolean
+     * @return bool
      */
     public function handle($event)
     {
         $this->value = $event->getValue();
+
         return false;
     }
 }

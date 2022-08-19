@@ -18,7 +18,7 @@ class DefaultQueue implements SQIQueue
         $redisConfig = array_merge([
             'scheme' => 'tcp',
             'host' => '127.0.0.1',
-            'port' => 6379
+            'port' => 6379,
         ], array_filter($redisConfig));
         $this->redis = new Client($redisConfig);
         $this->consumerId = rand(10000, 99999);
@@ -33,8 +33,8 @@ class DefaultQueue implements SQIQueue
     public function push($name, $object)
     {
         $error = false;
-        $id = $this->redis->executeRaw(["xadd", $name, "MAXLEN","~","1000",'*', "data", serialize($object)], $error);
-        if (!$error) {
+        $id = $this->redis->executeRaw(['xadd', $name, 'MAXLEN', '~', '1000', '*', 'data', serialize($object)], $error);
+        if (! $error) {
             return $id;
         }
         throw new SQException($error);
@@ -55,13 +55,18 @@ class DefaultQueue implements SQIQueue
         $startingId = 0
     ) {
         $error = false;
-        $res = $this->redis->executeRaw(["xread",
-            'COUNT',
-            $count,
-            "STREAMS",
-            $key,
-            $startingId], $error);
-        if (!$error) {
+        $res = $this->redis->executeRaw(
+            [
+                'xread',
+                'COUNT',
+                $count,
+                'STREAMS',
+                $key,
+                $startingId,
+            ],
+            $error
+        );
+        if (! $error) {
             $resultList = [];
             $idList = [];
             $this->getObject($res, $resultList, $idList);
@@ -72,6 +77,7 @@ class DefaultQueue implements SQIQueue
                 if ($resultList) {
                     return $resultList;
                 }
+
                 return null;
             }
         }
@@ -98,25 +104,35 @@ class DefaultQueue implements SQIQueue
     ) {
         $error = false;
         $startingSymbol = $newMessage ? '>' : "$startingId";
-        $this->redis->executeRaw(["xgroup",
-            "CREATE",
-            $name,
-            $groupName,
-            0,
-            "MKSTREAM"], $error);
+        $this->redis->executeRaw(
+            [
+                'xgroup',
+                'CREATE',
+                $name,
+                $groupName,
+                0,
+                'MKSTREAM',
+            ],
+            $error
+        );
         //if command complete with error -BUSYGROUP, continue
         $error = false;
-        $res = $this->redis->executeRaw(["xreadgroup",
-            "GROUP",
-            $groupName,
-            "$this->consumerId",
-            "COUNT",
-            "$count",
-            "STREAMS",
-            $name,
-            $startingSymbol], $error);
+        $res = $this->redis->executeRaw(
+            [
+                'xreadgroup',
+                'GROUP',
+                $groupName,
+                "$this->consumerId",
+                'COUNT',
+                "$count",
+                'STREAMS',
+                $name,
+                $startingSymbol,
+            ],
+            $error
+        );
 
-        if (!$error) {
+        if (! $error) {
             $resultList = [];
             $idList = [];
             $this->getObject($res, $resultList, $idList);
@@ -127,6 +143,7 @@ class DefaultQueue implements SQIQueue
                 if ($resultList) {
                     return $resultList;
                 }
+
                 return null;
             }
         }
@@ -142,11 +159,11 @@ class DefaultQueue implements SQIQueue
      */
     public function ack($name, $groupName, $id)
     {
-        $this->redis->executeRaw(["xack",
+        $this->redis->executeRaw(['xack',
             $name,
             $groupName,
-            $id], $error);
-        if (!$error) {
+            $id, ], $error);
+        if (! $error) {
             return true;
         }
         throw new SQException($error);
@@ -164,16 +181,16 @@ class DefaultQueue implements SQIQueue
 
     private function getObject($value, &$resultList, &$idList)
     {
-        if (!$value) {
+        if (! $value) {
             return null;
         }
         $res = reset($value);
-        if (!$res) {
+        if (! $res) {
             return null;
         }
         $firstKey = current($res);
         $firstValueSet = next($res);
-        if (!$firstValueSet) {
+        if (! $firstValueSet) {
             return null;
         }
         foreach ($firstValueSet as $valueTable) {
@@ -181,7 +198,7 @@ class DefaultQueue implements SQIQueue
             $value = next($valueTable);
             $serialResult = @$value[1];
             if ($serialResult) {
-                $resultList [] = unserialize($serialResult);
+                $resultList[] = unserialize($serialResult);
             }
         }
     }

@@ -7,13 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Class SQManagerTest
- * @package Laura\Module\Queue\StreamQueue
- *
- * Test that:
- * 1. Events are correctly queued
- * 2. Jobs are correctly queued
- * 3. shouldQueue parameter work as expected
- * 4. not queued events are correctly handled.
  */
 class SQManagerTest extends TestCase
 {
@@ -48,7 +41,6 @@ class SQManagerTest extends TestCase
      */
     public function testBasicListenerShouldQueue()
     {
-
         //one event, one listener
         (new TestEvent(345))->dispatch(['shouldQueue' => true]);
         $itemId = null;
@@ -168,8 +160,8 @@ class SQManagerTest extends TestCase
     public function tearDown(): void
     {
         SQManager::getInstance()->getQueue()->getRedis()->del([
-            SQManager::SQ_MANAGER_PREFIX . TestEvent::streamName(),
-            SQManager::SQ_MANAGER_PREFIX . SQManager::SQ_MANAGER_JOB_STREAM]);
+            SQManager::SQ_MANAGER_PREFIX.TestEvent::streamName(),
+            SQManager::SQ_MANAGER_PREFIX.SQManager::SQ_MANAGER_JOB_STREAM, ]);
     }
 
     public static function tearDownAfterClass(): void

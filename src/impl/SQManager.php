@@ -8,12 +8,14 @@ use Monolog\Logger;
 
 class SQManager
 {
-    public const SQ_MANAGER_PREFIX = "sqmanager:";
-    public const SQ_MANAGER_JOB_STREAM = "jobstream";
-    public const SQ_MANAGER_JOB_HANDLER = "jobhandler";
+    public const SQ_MANAGER_PREFIX = 'sqmanager:';
+
+    public const SQ_MANAGER_JOB_STREAM = 'jobstream';
+
+    public const SQ_MANAGER_JOB_HANDLER = 'jobhandler';
 
     /**
-     * @var SQIQueue $queue
+     * @var SQIQueue
      */
     private $queue;
 
@@ -24,30 +26,30 @@ class SQManager
 
     private $eventTable = [];
 
-    private $errorHandler = null;
-
     /** @var Logger */
     private $logger;
 
     private function __construct($queue, $logger)
     {
         $this->queue = $queue;
-        $this->logger = $logger ; 
+        $this->logger = $logger;
     }
 
-    public static function load($config=[]){
-        if (!self::$instance) {
+    public static function load($config = [])
+    {
+        if (! self::$instance) {
             $logger = new Logger(
-                isset($config['log_name'])
-                ? $config['log_name']
-                : 'queue');
-            if(isset($config['log_path'])){
+                $config['log_name']
+                ?? 'queue'
+            );
+            if (isset($config['log_path'])) {
                 $logger->pushHandler(new RotatingFileHandler(
                     $config['log_path'],
                     0,
-                    $config['log_level']??Logger::DEBUG));
+                    $config['log_level'] ?? Logger::DEBUG
+                ));
             }
-            self::$instance = new SQManager(new DefaultQueue($config), $logger);
+            self::$instance = new self(new DefaultQueue($config), $logger);
         }
     }
 
@@ -84,17 +86,17 @@ class SQManager
      */
     private function runNow($object)
     {
-        $this->logger->info("Load object without queue - ",(array)$object);
+        $this->logger->info('Load object without queue - ', (array) $object);
 
         if ($object instanceof SQIEvent) {
-            if (!isset($this->eventTable[$object::streamName()])) {
+            if (! isset($this->eventTable[$object::streamName()])) {
                 return;
             }
             foreach ($this->getListeners($object::streamName()) as $listener) {
                 try {
                     $listener->handle($object);
                 } catch (Exception $e) {
-                    $this->logger->error("Error running sync event - ",['message'=>$e->getMessage()]);
+                    $this->logger->error('Error running sync event - ', ['message'=>$e->getMessage()]);
                 }
             }
         } elseif ($object instanceof SQIJob) {
@@ -117,11 +119,11 @@ class SQManager
     public function getListeners($eventName)
     {
         return array_map(
-            fn($listener) =>
-                is_object($listener)
+            fn ($listener) => is_object($listener)
                     ? $listener
                     : new $listener(),
-            array_values($this->eventTable[$eventName] ?? []));
+            array_values($this->eventTable[$eventName] ?? [])
+        );
     }
 
     /**
@@ -131,10 +133,9 @@ class SQManager
      */
     public function dispatch($object, $parameter = [])
     {
-        $shouldQueue = isset($parameter['shouldQueue']) ?
-            $parameter['shouldQueue']
-            : $object->shouldQueue();
-        $this->logger->info("Event dispatched with queue:$shouldQueue - ",(array)$object);
+        $shouldQueue = $parameter['shouldQueue']
+            ?? $object->shouldQueue();
+        $this->logger->info("Event dispatched with queue:$shouldQueue - ", (array) $object);
         if ($shouldQueue) {
             $this->queueObject($object);
         } else {
@@ -149,9 +150,9 @@ class SQManager
     public function queueObject($object)
     {
         if ($object instanceof SQIEvent) {
-            $this->queue->push(self::SQ_MANAGER_PREFIX . $object::streamName(), $object);
+            $this->queue->push(self::SQ_MANAGER_PREFIX.$object::streamName(), $object);
         } elseif ($object instanceof SQIJob) {
-            $this->queue->push(self::SQ_MANAGER_PREFIX . self::SQ_MANAGER_JOB_STREAM, $object);
+            $this->queue->push(self::SQ_MANAGER_PREFIX.self::SQ_MANAGER_JOB_STREAM, $object);
         }
     }
 
@@ -167,19 +168,19 @@ class SQManager
      */
     public function loadItem($streamName, $groupName, &$itemId, $count = 1, $newMessage = true, $startId = 0)
     {
-        $item= $this->queue->groupRead(
-            self::SQ_MANAGER_PREFIX . $streamName,
+        $item = $this->queue->groupRead(
+            self::SQ_MANAGER_PREFIX.$streamName,
             $groupName,
             $itemId,
             $count,
             $newMessage,
             $startId
         );
-        if($item){
-            $this->logger->info("Load from queue - ", (array)$item);
+        if ($item) {
+            $this->logger->info('Load from queue - ', (array) $item);
         }
-        return $item;
 
+        return $item;
     }
 
     /**
@@ -189,7 +190,7 @@ class SQManager
      */
     public function ackItem(string $eventName, $streamGroupName, $itemId)
     {
-        $this->queue->ack(self::SQ_MANAGER_PREFIX . $eventName, $streamGroupName, $itemId);
+        $this->queue->ack(self::SQ_MANAGER_PREFIX.$eventName, $streamGroupName, $itemId);
     }
 
     /**
@@ -206,8 +207,8 @@ class SQManager
         $this->eventTable = [];
     }
 
-    public function getLogger(){
+    public function getLogger()
+    {
         return $this->logger;
     }
-
 }

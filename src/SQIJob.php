@@ -7,7 +7,7 @@ interface SQIJob
     public function dispatch($parameters = []);
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function handle();
 

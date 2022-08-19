@@ -7,6 +7,7 @@ use Laura\Lib\Queue\BaseJob;
 class TestStaticJob extends BaseJob
 {
     private static $staticValue = 0;
+
     private $value;
 
     public function __construct($value)
@@ -15,11 +16,12 @@ class TestStaticJob extends BaseJob
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function handle()
     {
         self::$staticValue += $this->value;
+
         return true;
     }
 

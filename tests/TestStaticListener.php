@@ -8,7 +8,6 @@ class TestStaticListener extends BaseListener
 {
     private static $value = 0;
 
-
     public static function getValue()
     {
         return self::$value;
@@ -16,11 +15,12 @@ class TestStaticListener extends BaseListener
 
     /**
      * @param TestEvent $event
-     * @return boolean
+     * @return bool
      */
     public function handle($event)
     {
         self::$value += $event->getValue();
+
         return true;
     }
 }

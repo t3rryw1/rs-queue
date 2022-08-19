@@ -6,7 +6,7 @@ interface SQIListener
 {
     /**
      * @param SQIEvent $event
-     * @return boolean
+     * @return bool
      */
     public function handle($event);
 
@@ -17,7 +17,7 @@ interface SQIListener
 
     /**
      * decide whether to process old event, when worker run in rescue mode
-     * @return boolean
+     * @return bool
      */
     public function processOldItem();
 }
