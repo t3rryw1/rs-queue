@@ -121,7 +121,7 @@ class SQManager
                 is_object($listener)
                     ? $listener
                     : new $listener(),
-            array_keys($this->eventTable[$eventName] ?? []));
+            array_values($this->eventTable[$eventName] ?? []));
     }
 
     /**
