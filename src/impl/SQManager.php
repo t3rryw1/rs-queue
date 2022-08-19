@@ -107,15 +107,7 @@ class SQManager
      */
     public function getEvents()
     {
-        return array_map(
-            fn($listeners) =>
-                array_map(
-                    fn($listener) =>
-                        is_object($listener)
-                            ? $listener
-                            : new $listener(),
-                    $listeners),
-            array_keys($this->eventTable));
+        return array_keys($this->eventTable);
     }
 
     /**
@@ -124,7 +116,12 @@ class SQManager
      */
     public function getListeners($eventName)
     {
-        return $this->eventTable[$eventName] ?? [];
+        return array_map(
+            fn($listener) =>
+                is_object($listener)
+                    ? $listener
+                    : new $listener(),
+            array_keys($this->eventTable[$eventName] ?? []));
     }
 
     /**
