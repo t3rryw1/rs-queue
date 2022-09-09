@@ -3,7 +3,7 @@
 namespace Laura\Lib\Queue;
 
 use Exception;
-use Monolog\Handler\RotatingFileHandler;
+use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
 class SQManager
@@ -43,9 +43,8 @@ class SQManager
                 ?? 'queue'
             );
             if (isset($config['log_path'])) {
-                $logger->pushHandler(new RotatingFileHandler(
+                $logger->pushHandler(new StreamHandler(
                     $config['log_path'],
-                    0,
                     $config['log_level'] ?? Logger::DEBUG
                 ));
             }
